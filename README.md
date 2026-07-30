@@ -133,6 +133,8 @@ L'API sera disponible sur `http://localhost:3000`
 **Evans Nzati** — Responsable Backend
 [GitHub](https://github.com/EvansNzati007) · [LinkedIn](https://linkedin.com/in/evansnzati)
 
+**NDONG NGOUA Andrew** - Responsable Frontend
+
 ---
 
 *Projet tutoré — Master 2 Génie Logiciel, ESGIS Gabon.*
