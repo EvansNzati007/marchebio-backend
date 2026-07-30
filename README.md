@@ -130,7 +130,7 @@ L'API sera disponible sur `http://localhost:3000`
 
 ## 👤 Équipe
 
-**Evans Nzati** — Responsable Backend
+**Evans NZATI** — Responsable Backend
 [GitHub](https://github.com/EvansNzati007) · [LinkedIn](https://linkedin.com/in/evansnzati)
 
 **NDONG NGOUA Andrew** - Responsable Frontend
