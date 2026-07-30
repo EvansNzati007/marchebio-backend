@@ -1,98 +1,138 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🌱 MarchéBio — Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Place de marché numérique reliant producteurs locaux et acheteurs urbains, en réduisant les intermédiaires.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Projet réalisé dans le cadre d'un projet tutoré (module de 30h) — Master 2 Génie Logiciel, ESGIS Gabon.
 
-## Description
+---
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 🎯 Le projet
 
-## Project setup
+Les producteurs de la périphérie peinent souvent à écouler leur production faute de canaux de distribution directs, tandis que les citadins cherchent des produits frais et locaux. **MarchéBio** connecte les deux directement : le producteur publie ses produits, l'acheteur parcourt, commande, et suit sa livraison.
 
-```bash
-$ npm install
+Ce dépôt contient le **backend** de l'application, dont je suis responsable au sein de l'équipe projet.
+
+---
+
+## ✨ Fonctionnalités (MVP)
+
+- 🔐 **Authentification** — inscription/connexion pour 3 profils : Producteur, Acheteur, Administrateur (JWT)
+- 📦 **Gestion des produits** — CRUD complet côté producteur (nom, prix, quantité, photo)
+- 🔍 **Catalogue & recherche** — parcours et recherche des produits côté acheteur
+- 🛒 **Panier & commande** — panier côté client, validation en commande avec lignes de commande
+- 📋 **Suivi des commandes** — statuts NOUVELLE → PRÉPARÉE → LIVRÉE
+- 🛠️ **Back-office administrateur** — supervision des utilisateurs, produits et commandes
+
+### Bonus (si le temps le permet)
+- 💳 Paiement mobile simulé (Airtel Money / Moov Money)
+- ⭐ Notation des producteurs par les acheteurs
+- 📍 Géolocalisation des producteurs
+
+---
+
+## 🛠️ Stack technique
+
+- **NestJS** — framework backend (TypeScript)
+- **Prisma** — ORM
+- **MySQL** — base de données
+- **JWT** — authentification par tokens
+- **class-validator** — validation des données
+- **Swagger** — documentation de l'API
+
+---
+
+## 🏗️ Modélisation des données
+
+Le modèle s'articule autour de 5 entités : `User`, `Produit`, `Commande`, `LigneCommande`, `Evaluation`.
+
+Point clé : une commande peut contenir **plusieurs produits** grâce à l'entité `LigneCommande`, qui fige aussi le prix unitaire au moment de l'achat.
+
+```
+User (1) ----< (N) Produit           : un producteur publie plusieurs produits
+User (1) ----< (N) Commande          : un acheteur passe plusieurs commandes
+Commande (1) ----< (N) LigneCommande : une commande contient plusieurs lignes
+Produit (1) ----< (N) LigneCommande  : un produit apparaît dans plusieurs lignes
+User (1) ----< (N) Evaluation        : en tant qu'acheteur ou producteur
 ```
 
-## Compile and run the project
+*Le détail complet (champs, contraintes, règles de gestion) est disponible dans le [Cahier des Charges](./docs/CahierDesCharges_MarcheBio.docx).*
 
-```bash
-# development
-$ npm run start
+---
 
-# watch mode
-$ npm run start:dev
+## 🏛️ Architecture du backend
 
-# production mode
-$ npm run start:prod
+```
+src/
+├── auth/            # Authentification (JWT, guards, stratégies)
+├── users/            # Gestion des utilisateurs et des rôles
+├── produits/         # CRUD produits (producteur)
+├── commandes/        # Commandes, lignes de commande, statuts
+├── evaluations/       # Notation des producteurs
+├── prisma/           # Service Prisma partagé
+└── common/            # Guards de rôles, décorateurs, filtres partagés
 ```
 
-## Run tests
+---
+
+## 🚀 Installation & lancement
+
+### Prérequis
+- Node.js (v18+)
+- MySQL
+
+### Étapes
 
 ```bash
-# unit tests
-$ npm run test
+# Cloner le dépôt
+git clone https://github.com/EvansNzati007/marchebio-backend.git
+cd marchebio-backend
 
-# e2e tests
-$ npm run test:e2e
+# Installer les dépendances
+npm install
 
-# test coverage
-$ npm run test:cov
+# Configurer les variables d'environnement
+cp .env.example .env
+# (renseigner DATABASE_URL et JWT_SECRET dans .env)
+
+# Appliquer les migrations Prisma
+npx prisma migrate dev
+
+# Démarrer le serveur en mode développement
+npm run start:dev
 ```
 
-## Deployment
+L'API sera disponible sur `http://localhost:3000`
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+---
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## 📡 Aperçu des endpoints
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+| Méthode | Endpoint | Description | Rôle requis |
+|---------|----------|--------------|-------------|
+| POST | `/auth/register` | Créer un compte | Public |
+| POST | `/auth/login` | Se connecter | Public |
+| GET | `/produits` | Lister les produits disponibles | Public |
+| POST | `/produits` | Publier un produit | Producteur |
+| POST | `/commandes` | Passer une commande | Acheteur |
+| GET | `/commandes/mes-commandes` | Suivre ses commandes | Acheteur |
+| PATCH | `/commandes/:id/statut` | Changer le statut d'une commande | Producteur / Admin |
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## 📐 Règles de gestion clés
 
-Check out a few resources that may come in handy when working with NestJS:
+- Un producteur ne peut pas commander ses propres produits
+- Une commande ne peut plus être modifiée une fois au statut `PRÉPARÉE`
+- Le stock diminue automatiquement à la validation d'une commande
+- Une commande ne peut être validée si le stock est insuffisant
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+---
 
-## Support
+## 👤 Équipe
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+**Evans Nzati** — Responsable Backend
+[GitHub](https://github.com/EvansNzati007) · [LinkedIn](https://linkedin.com/in/evansnzati)
 
-## Stay in touch
+---
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+*Projet tutoré — Master 2 Génie Logiciel, ESGIS Gabon.*
