@@ -7,6 +7,77 @@ datasource db {
   provider = "mysql"
 }
 
+model User {
+  id                 Int          @id @default(autoincrement())
+  email              String       @unique
+  userName           String
+  password           String
+  adresse            String?
+  numTel             String       @unique
+  role               Role         @default(ACHETEUR)
+  commandes          Commande[]
+  evaluationsRecues  Evaluation[] @relation("EvaluationsRecues")
+  evaluationsDonnees Evaluation[] @relation("EvaluationsDonnees")
+  products           Product[]
+}
+
+model Product {
+  id             Int             @id @default(autoincrement())
+  name           String
+  description    String?
+  price          Float
+  quantity       Int             @default(0)
+  photoData      String?         @db.LongText // ← Base64 de l'image
+  photoMimeType  String?         @db.Text // ← "image/jpeg" ou "image/png"
+  producteurId   Int // ← Corrigé (était produteurId)
+  ligneCommandes LigneCommande[]
+  user           User            @relation(fields: [producteurId], references: [id])
+
+  @@index([producteurId], map: "Product_producteurId_fkey")
+}
+
+model Commande {
+  id             Int             @id @default(autoincrement())
+  dateCommande   DateTime        @default(now())
+  montantTotal   Float
+  statut         StatutCommande  @default(NOUVELLE)
+  userId         Int
+  user           User            @relation(fields: [userId], references: [id])
+  evaluations    Evaluation[]
+  ligneCommandes LigneCommande[]
+
+  @@index([userId], map: "Commande_userId_fkey")
+}
+
+model LigneCommande {
+  id           Int      @id @default(autoincrement())
+  quantity     Int
+  prixUnitaire Float
+  productId    Int
+  commandeId   Int
+  commande     Commande @relation(fields: [commandeId], references: [id])
+  product      Product  @relation(fields: [productId], references: [id])
+
+  @@index([commandeId], map: "LigneCommande_commandeId_fkey")
+  @@index([productId], map: "LigneCommande_productId_fkey")
+}
+
+model Evaluation {
+  id           Int       @id @default(autoincrement())
+  note         Int
+  commentaire  String?
+  userId       Int
+  producteurId Int
+  commandeId   Int?
+  commande     Commande? @relation(fields: [commandeId], references: [id])
+  producteur   User      @relation("EvaluationsRecues", fields: [producteurId], references: [id])
+  user         User      @relation("EvaluationsDonnees", fields: [userId], references: [id])
+
+  @@index([commandeId], map: "Evaluation_commandeId_fkey")
+  @@index([producteurId], map: "Evaluation_producteurId_fkey")
+  @@index([userId], map: "Evaluation_userId_fkey")
+}
+
 enum Role {
   PRODUCTEUR
   ACHETEUR
@@ -17,72 +88,4 @@ enum StatutCommande {
   NOUVELLE
   PREPAREE
   LIVREE
-}
-
-model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
-  userName String
-  password String
-  adresse  String?
-  numTel   String  @unique
-  role     Role    @default(ACHETEUR)
-
-  products  Product[]
-  commandes Commande[]
-
-  evaluationsDonnees Evaluation[] @relation("EvaluationsDonnees")
-  evaluationsRecues  Evaluation[] @relation("EvaluationsRecues")
-}
-
-model Product {
-  id          Int     @id @default(autoincrement())
-  name        String
-  description String?
-  price       Float
-  quantity    Int
-  photo       String?
-
-  produteurId Int
-  user        User @relation(fields: [produteurId], references: [id])
-
-  ligneCommandes LigneCommande[]
-}
-
-model Commande {
-  id           Int            @id @default(autoincrement())
-  dateCommande DateTime       @default(now())
-  montantTotal Float
-  statut       StatutCommande @default(NOUVELLE)
-
-  userId Int
-  user   User @relation(fields: [userId], references: [id])
-
-  ligneCommandes LigneCommande[]
-  evaluations    Evaluation[]
-}
-
-model LigneCommande {
-  id           Int   @id @default(autoincrement())
-  quantity     Int
-  prixUnitaire Float
-
-  productId  Int
-  commandeId Int
-  product    Product  @relation(fields: [productId], references: [id])
-  commande   Commande @relation(fields: [commandeId], references: [id])
-}
-
-model Evaluation {
-  id          Int     @id @default(autoincrement())
-  note        Int
-  commentaire String?
-
-  userId       Int
-  producteurId Int
-  commandeId   Int?
-
-  user       User      @relation("EvaluationsDonnees", fields: [userId], references: [id])
-  producteur User      @relation("EvaluationsRecues", fields: [producteurId], references: [id])
-  commande   Commande? @relation(fields: [commandeId], references: [id])
 }

@@ -41,7 +41,20 @@ export class AuthService {
     }
 
     // 3. Générer le token
-    return this.generateToken(user.id, user.email, user.role);
+    const token = this.generateToken(user.id, user.email, user.role);
+
+    // ✅ Retourner user + token
+    return {
+      access_token: token.access_token,
+      user: {
+        id: user.id,
+        email: user.email,
+        userName: user.userName,
+        role: user.role,
+        numTel: user.numTel,
+        adresse: user.adresse,
+      },
+    };
   }
 
   private generateToken(userId: number, email: string, role: string) {

@@ -7,6 +7,9 @@ import { PrismaModule } from './prisma/prisma.module';
 import { LoggerModule } from './logger/logger.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { ProduitModule } from './produit/produit.module';
+import { CommandeModule } from './commande/commande.module';
+import { AdminModule } from './admin/admin.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -19,6 +22,9 @@ import configuration from './config/configuration';
     LoggerModule,
     UserModule,
     AuthModule,
+    ProduitModule,
+    CommandeModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],

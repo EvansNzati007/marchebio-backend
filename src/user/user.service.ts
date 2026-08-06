@@ -1,5 +1,9 @@
 // src/user/user.service.ts
-import { Injectable, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from '../auth/dto/RegisterDto';
@@ -52,5 +56,29 @@ export class UserService {
     return this.prisma.user.findUnique({
       where: { email },
     });
+  }
+
+  async findById(id: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        userName: true,
+        role: true,
+        numTel: true,
+        adresse: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Utilisateur non trouvé');
+    }
+
+    return user;
+  }
+
+  async findMe(id: number) {
+    return this.findById(id);
   }
 }
